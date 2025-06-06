@@ -3,7 +3,7 @@
 
 /*
 *
-* Copyright 2019 FIWARE Foundation e.V.
+* Copyright 2022 FIWARE Foundation e.V.
 *
 * This file is part of Orion-LD Context Broker.
 *
@@ -27,15 +27,33 @@
 */
 extern "C"
 {
-#include "kjson/KjNode.h"                                      // KjNode
+#include "kjson/KjNode.h"                                     // KjNode
 }
+
+#include "orionld/types/OrionldAttributeType.h"               // OrionldAttributeType
+#include "orionld/types/OrionldContextItem.h"                 // OrionldContextItem
 
 
 
 // -----------------------------------------------------------------------------
 //
-// pcheckAttribute -
+// pCheckAttribute -
 //
-extern bool pcheckAttribute(KjNode* aP, char* type, bool typeMandatory, char** detailsP);
+// attrTypeFromDb is needed, only for PATCH Entity/Attribute, to make sure
+// the attribute update isn't trying to modify the type of the attribute.
+// API endpoints other than those two need not make this check as attributes are REPLACED.
+//
+// Likewise, in the second (recursive) call to pCheckAttribute for PATCH Attribute, it is not
+// needed as all sub-attributes are REPLACED.
+//
+extern bool pCheckAttribute
+(
+  const char*             entityId,
+  KjNode*                 attrP,
+  bool                    isAttribute,
+  OrionldAttributeType    attrTypeFromDb,
+  bool                    attrNameAlreadyExpanded,
+  OrionldContextItem*     attrContextInfoP
+);
 
 #endif  // SRC_LIB_ORIONLD_PAYLOADCHECK_PCHECKATTRIBUTE_H_
